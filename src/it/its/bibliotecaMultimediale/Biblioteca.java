@@ -7,25 +7,17 @@ import java.util.Set;
 
 public class Biblioteca {
     private final Set<MaterialeBiblioteca> collezioneMateriali;
-    private final Set<Utente> collezioneUtente;
-    private final Set<Prestito> collezionePrestito;
 
     public Biblioteca() {
         this.collezioneMateriali = new HashSet<>();
-        this.collezioneUtente = new HashSet<>();
-        this.collezionePrestito = new HashSet<>();
+    }
+
+    public Set<MaterialeBiblioteca> getCollezioneMateriali() {
+        return collezioneMateriali;
     }
 
     public void aggiungiMateriali(MaterialeBiblioteca materiale) {
         collezioneMateriali.add(materiale);
-    }
-
-    public void aggiungiUtente(Utente utente) {
-        collezioneUtente.add(utente);
-    }
-
-    public void aggiungiPrestito(Prestito prestito) {
-        collezionePrestito.add(prestito);
     }
 
     public String stampaCollezioneMateriali() {
@@ -37,33 +29,16 @@ public class Biblioteca {
         return builder.toString();
     }
 
-    public String stampaCollezioneUtente() {
-        StringBuilder builder = new StringBuilder();
-        for (Utente utente : collezioneUtente) { //classe per collezione
-            builder.append(utente.toString());
-            builder.append("\n");
-        }
-        return builder.toString();
-    }
-
-    public String stampaCollezionePrestito() {
-        StringBuilder builder = new StringBuilder();
-        for (Prestito prestito : collezionePrestito) { //classe per collezione
-            builder.append(prestito.toString());
-            builder.append("\n");
-        }
-        return builder.toString();
-    }
-
-    public List<MaterialeBiblioteca> ricercaElementi(String titolo) {
+    public List<MaterialeBiblioteca> ricercaElementi(String titolo) throws Exception {
         //mod accesso, tipo ritorno, nome metodo e parametri
         List<MaterialeBiblioteca> risultato = new ArrayList<>();
         for (MaterialeBiblioteca materiale : collezioneMateriali) {
             if (titolo.equals(materiale.getTitolo())) {
                 risultato.add(materiale);
-
             }
         }
+        if(risultato.isEmpty())
+           throw new NoItemException("Errore");
         return risultato;
     }
 
@@ -86,14 +61,20 @@ public class Biblioteca {
 
     public List<MaterialeBiblioteca> ricercaElementi(Class<? extends MaterialeBiblioteca> clazz) {
         //mod accesso, tipo ritorno, nome metodo e parametri
-        List<MaterialeBiblioteca> risultato= new ArrayList<>();
-        for(MaterialeBiblioteca materiale: collezioneMateriali){
-            if(materiale.getClass().equals(clazz)){
+        List<MaterialeBiblioteca> risultato = new ArrayList<>();
+        for (MaterialeBiblioteca materiale : collezioneMateriali) {
+            if (materiale.getClass().equals(clazz)) {
                 risultato.add(materiale);
             }
         }
         return risultato;
     }
 
-
+    public void dettaglio(long id) {
+        for (MaterialeBiblioteca materiale : collezioneMateriali) {
+            if (id == materiale.getId()) {
+                System.out.println("Oggetto trovato: " + materiale);
+            }
+        }
+    }
 }

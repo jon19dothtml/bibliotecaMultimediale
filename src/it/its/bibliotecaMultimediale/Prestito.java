@@ -7,13 +7,12 @@ public class Prestito {
     private final MaterialeBiblioteca riferimentoMateriale;
     private final Utente riferimentoUtente;
     private final LocalDate dataPrestito;
-    private final LocalDate dataRestituzione;
+    private LocalDate dataRestituzione;
 
-    public Prestito(MaterialeBiblioteca riferimentoMateriale, Utente riferimentoUtente, LocalDate dataPrestito, LocalDate dataRestituzione) {
+    public Prestito(MaterialeBiblioteca riferimentoMateriale, Utente riferimentoUtente, LocalDate dataPrestito) {
         this.riferimentoMateriale = riferimentoMateriale;
         this.riferimentoUtente = riferimentoUtente;
         this.dataPrestito = dataPrestito;
-        this.dataRestituzione = dataRestituzione;
     }
 
     public MaterialeBiblioteca getRiferimentoMateriale() {
@@ -30,6 +29,10 @@ public class Prestito {
 
     public LocalDate getDataRestituzione() {
         return dataRestituzione;
+    }
+
+    public void setDataRestituzione(LocalDate dataRestituzione) {
+        this.dataRestituzione = dataRestituzione;
     }
 
     @Override

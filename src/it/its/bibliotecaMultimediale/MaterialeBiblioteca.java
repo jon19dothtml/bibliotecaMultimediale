@@ -1,8 +1,14 @@
 package it.its.bibliotecaMultimediale;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class MaterialeBiblioteca {
+public abstract class MaterialeBiblioteca implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private final long id;
     private final String titolo;
     private final int annoRilascio;
