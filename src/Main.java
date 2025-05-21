@@ -2,11 +2,14 @@ import it.its.bibliotecaMultimediale.*;
 
 import javax.swing.*;
 import java.io.*;
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -72,8 +75,8 @@ public class Main {
     }
 
     private static Biblioteca caricaBiblioteca() {
+        Biblioteca biblioteca = new Biblioteca();
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("C:/Users/A880apulia/IdeaProjects/Biblioteca/resource/biblioteca.txt"))) {
-            Biblioteca biblioteca = new Biblioteca();
             MaterialeBiblioteca materialeBiblioteca = null;
             while ((materialeBiblioteca = (MaterialeBiblioteca) inputStream.readObject()) != null) {
                 biblioteca.aggiungiMateriali(materialeBiblioteca);
@@ -88,7 +91,7 @@ public class Main {
         } finally {
             System.out.println("Questo lo eseguo sempre");
         }
-        return new Biblioteca();
+        return biblioteca;
     }
 
     private static void ricercaUtente(GestioneUtenti gestioneUtenti, Scanner scanner) {
@@ -101,16 +104,62 @@ public class Main {
     }
 
     private static void ricercaMateriale(Biblioteca biblioteca, Scanner scanner) {
-        String titolo = scanner.nextLine();
-        try {
-            List<MaterialeBiblioteca> risultato = biblioteca.ricercaElementi(titolo);
-            System.out.println("Risultato: " + risultato);
-        } catch (Exception e) {
-            System.out.println("non ho trovato nessun elemento con titolo: " + titolo);
+        System.out.println("Per cosa vuoi ricercare il materiale? \n" +
+                "\n1- per titolo" +
+                "\n2- per autore" +
+                "\n3- per tipo" +
+                "\n0- per uscire");
+        int scelta= scanner.nextInt();
+        scanner.nextLine();
+        switch(scelta) {
+            case 0:
+                System.out.println("Arrivederci");
+                break;
+            case 1:
+                System.out.println("Inserisci il titolo: ");
+                String titolo = scanner.nextLine();
+                try {
+                    List<MaterialeBiblioteca> risultato = biblioteca.ricercaElementi(titolo);
+                    System.out.println("Risultato: " + risultato);
+
+                } catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con titolo: " + titolo);
+                }
+                break;
+            case 2:
+                System.out.println("Inserisci l'autore/ regista");
+                Autore autore= Main.acquisisciAutore(scanner);
+                try{
+                    List<MaterialeBiblioteca> risultato = biblioteca.ricercaElementi(autore);
+                    System.out.println("Risultato: " + risultato);
+                }catch (Exception e){
+                    System.out.println("non ho trovato nessun elemento con AUTORE: " + autore);
+                }
+                break;
+            case 3:
+                Map<String, Class<? extends MaterialeBiblioteca>> TIPO_MAP = new HashMap<>();
+                TIPO_MAP.put("libro", Libro.class);
+                TIPO_MAP.put("dvd", DVD.class);
+                TIPO_MAP.put("rivista", Rivista.class);
+                System.out.println("Inserisci il tipo da cercare: ");
+                String tipo= scanner.nextLine();
+                if (tipo == null)
+                    throw new IllegalArgumentException("Valore nullo");
+                tipo = tipo.toLowerCase();
+                Class<? extends MaterialeBiblioteca> tipoClass= TIPO_MAP.get(tipo);
+                if (tipoClass == null) {
+                   throw new IllegalArgumentException("Tipo non valido");
+                }
+                List<MaterialeBiblioteca> risultato= biblioteca.ricercaElementi(tipoClass);
+                System.out.println("Risultato: " +risultato);
+                break;
+            default:
+                System.out.println("Scelta non valida!!! Arrivederci e grazie");
         }
     }
 
     private static void aggiungiUtente(GestioneUtenti gestioneUtenti, Scanner scanner) {
+
     }
 
     private static void aggiungiMateriale(Biblioteca biblioteca, Scanner scanner) {
@@ -135,7 +184,7 @@ public class Main {
         scanner.nextLine();
         switch (scelta) {
             case 1:
-                System.out.println("Hai selezionato: Libro !");
+//                System.out.println("Hai selezionato: Libro !");
                 System.out.println("Inserisci ISBN:");
                 String ISBN = scanner.nextLine();
                 System.out.println("Inserisci il numero di pagine: ");
@@ -147,11 +196,12 @@ public class Main {
                 biblioteca.aggiungiMateriali(libro);
                 break;
             case 2:
-                System.out.println("Hai selezionato: DVD !");
+//                System.out.println("Hai selezionato: DVD !");
                 System.out.println("Inserisci il regista: ");
                 Autore regista = Main.acquisisciAutore(scanner);
                 System.out.println("Inserisci la durata in minuti:");
                 int durata = scanner.nextInt();
+                scanner.nextLine();
                 System.out.println("Inserisci il genere: ");
                 String genere = scanner.nextLine();
                 DVD.Genere genereEnum = DVD.Genere.lookUp(genere);
@@ -159,7 +209,7 @@ public class Main {
                 biblioteca.aggiungiMateriali(dvd);
                 break;
             case 3:
-                System.out.println("Hai selezionato rivista !");
+//                System.out.println("Hai selezionato rivista !");
                 System.out.println("Inserisci il numero di uscita: ");
                 int numeroUscita = scanner.nextInt();
                 scanner.nextLine();

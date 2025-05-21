@@ -79,13 +79,13 @@ public class DVD extends MaterialeBiblioteca implements Serializable {
     @Override
     public String toString() {
         return "DVD{" +
-                "id=" + this.getId() +
-                "titolo='" + this.getTitolo() + '\'' +
-                "annoRilascio=" + this.getAnnoRilascio() + '\'' +
-                "disponibilita=" + this.getDisponibilita() + '\'' +
-                "regista=" + regista +
-                ", durata=" + durata +
-                ", genere=" + genere +
+                ",\nid=" + this.getId() +
+                ",\ntitolo='" + this.getTitolo() + '\'' +
+                ",\nannoRilascio=" + this.getAnnoRilascio() + '\'' +
+                ",\ndisponibilita=" + this.getDisponibilita() + '\'' +
+                ",\nregista=" + regista +
+                ",\ndurata=" + durata +
+                ",\ngenere=" + genere +
                 '}';
     }
 }

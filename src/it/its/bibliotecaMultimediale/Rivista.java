@@ -71,12 +71,12 @@ public class Rivista extends MaterialeBiblioteca implements Serializable {
     @Override
     public String toString() {
         return "Rivista{" +
-                "id=" + this.getId() +
-                "titolo='" + this.getTitolo() + '\'' +
-                "annoRilascio=" + this.getAnnoRilascio() + '\'' +
-                "disponibilita=" + this.getDisponibilita() + '\'' +
-                "numeroUscita=" + numeroUscita +
-                "periodicita=" + periodicita +
+                ",\nid=" + this.getId() +
+                ",\ntitolo='" + this.getTitolo() + '\'' +
+                ",\nannoRilascio=" + this.getAnnoRilascio() + '\'' +
+                ",\ndisponibilita=" + this.getDisponibilita() + '\'' +
+                ",\nnumeroUscita=" + numeroUscita +
+                ",\nperiodicita=" + periodicita +
                 '}';
     }
 }

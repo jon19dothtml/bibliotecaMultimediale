@@ -7,7 +7,7 @@ import java.util.Objects;
 public class Libro extends MaterialeBiblioteca implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L; //da aggiungere sempre
 
     private final String ISBN;
     private final int pagine;
@@ -49,14 +49,14 @@ public class Libro extends MaterialeBiblioteca implements Serializable {
 
     @Override
     public String toString() {
-        return "Libro{" +
-                "id=" + this.getId() +
-                "titolo='" + this.getTitolo() + '\'' +
-                "annoRilascio=" + this.getAnnoRilascio() + '\'' +
-                "disponibilita=" + this.getDisponibilita() + '\'' +
-                "ISBN='" + ISBN + '\'' +
-                ", pagine=" + pagine +
-                ", riferimentoAutore=" + riferimentoAutore +
+        return "Libro{\n" +
+                "id= " + this.getId() +
+                ",\ntitolo='" + this.getTitolo() + '\'' +
+                ",\nannoRilascio=" + this.getAnnoRilascio() + '\'' +
+                ",\ndisponibilita=" + this.getDisponibilita() + '\'' +
+                ",\nISBN='" + ISBN + '\'' +
+                ",\npagine=" + pagine +
+                ",\nriferimentoAutore=" + riferimentoAutore +
                 '}';
     }
 }
