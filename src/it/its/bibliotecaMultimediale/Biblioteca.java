@@ -42,6 +42,15 @@ public class Biblioteca {
         return risultato;
     }
 
+    public MaterialeBiblioteca ricercaElementi(long id) {
+        for (MaterialeBiblioteca materiale : collezioneMateriali) {
+            if (id==materiale.getId()) {
+                return materiale;
+            }
+        }
+        return null;
+    }
+
     public List<MaterialeBiblioteca> ricercaElementi(Autore autore) {
         //mod accesso, tipo ritorno, nome metodo e parametri
         List<MaterialeBiblioteca> risultato = new ArrayList<>();

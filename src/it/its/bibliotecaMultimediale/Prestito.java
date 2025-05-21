@@ -10,6 +10,7 @@ public class Prestito implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+
     private final MaterialeBiblioteca riferimentoMateriale;
     private final Utente riferimentoUtente;
     private final LocalDate dataPrestito;
