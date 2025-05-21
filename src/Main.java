@@ -18,8 +18,8 @@ public class Main {
     public static void main(String[] args) {
 
         Biblioteca biblioteca = Main.caricaBiblioteca();
+        GestioneUtenti gestioneUtenti= Main.caricaUtenti();
         GestionePrestiti gestionePrestiti = new GestionePrestiti();
-        GestioneUtenti gestioneUtenti = new GestioneUtenti();
         int scelta = 0;
         do {
             System.out.println("""
@@ -61,6 +61,7 @@ public class Main {
             }
         } while (scelta != 0);
         Main.salvaBibilioteca(biblioteca);
+        Main.salvaUtenti(gestioneUtenti);
     }
 
     private static void salvaBibilioteca(Biblioteca biblioteca) {
@@ -94,13 +95,93 @@ public class Main {
         return biblioteca;
     }
 
+    public static void salvaUtenti(GestioneUtenti gestioneUtenti){
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("C:/Users/A880apulia/IdeaProjects/Biblioteca/resource/utente.txt"))) {
+            for (Utente utente : gestioneUtenti.getCollezioneUtenti()) {
+                outputStream.writeObject(utente);
+            }
+        } catch (IOException ex) {
+            System.out.println("Eccezione in scrittura");
+            ex.printStackTrace();
+        }
+    }
+
+    public static GestioneUtenti caricaUtenti(){
+        GestioneUtenti gestioneUtenti= new GestioneUtenti();
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("C:/Users/A880apulia/IdeaProjects/Biblioteca/resource/utente.txt"))) {
+            Utente utente= null;
+            while ((utente = (Utente) inputStream.readObject()) != null) {
+                gestioneUtenti.aggiungiUtente(utente);
+            }
+            System.out.println("Caricati: " + gestioneUtenti.getCollezioneUtenti().size());
+            return gestioneUtenti;
+        } catch (EOFException eofException) {
+            System.out.println("End of file raggiunta");
+        } catch (IOException | ClassNotFoundException ioEx) {
+            System.out.println("Eccezione");
+            ioEx.printStackTrace();
+        } finally {
+            System.out.println("Questo lo eseguo sempre");
+        }
+        return gestioneUtenti;
+    }
+
     private static void ricercaUtente(GestioneUtenti gestioneUtenti, Scanner scanner) {
+        System.out.println("Scegli per cosa ricercare. Spingi: " +
+                "\n1- per ricercare per id" +
+                "\n2- per ricercare per nome e cognome" +
+                "\n3- per ricercare per nome o cognome" +
+                "\n0- per uscire");
+        int scelta= scanner.nextInt();
+        scanner.nextLine();
+        switch (scelta){
+            case 0:
+                System.out.println("Arrivederci");
+                break;
+            case 1:
+                System.out.println("Inserisci l'id da ricercare: ");
+                int id= scanner.nextInt();
+                scanner.nextLine();
+                try {
+                    Utente risultato= gestioneUtenti.ricercaUtente(id);
+                    System.out.println("Risultato: " + risultato);
+
+                } catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con id: " + id);
+                }
+                break;
+            case 2:
+                System.out.println("Inserisci il nome da ricercare: ");
+                String nome= scanner.nextLine();
+                System.out.println("Inserisci il cognome da ricercare: ");
+                String cognome= scanner.nextLine();
+                try {
+                    List<Utente> risultato = gestioneUtenti.ricercaUtente(nome, cognome);
+                    System.out.println("Risultato: " +risultato);
+                } catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con nome: " + nome + "e cognome: " + cognome);
+                }
+                break;
+            case 3:
+                System.out.println("Inserisci il nome o il cognome da ricercare");
+                String ricerca= scanner.nextLine();
+            try {
+                    List<Utente> risultato= gestioneUtenti.ricercaUtente(ricerca);
+                    System.out.println("Risultato: " +risultato);
+                }catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con nome o cognome: " + ricerca);
+                }
+                break;
+            default:
+                System.out.println("Scelta non valida!!! Arrivederci e grazie");
+        }
     }
 
     private static void restituzionePrestito(Biblioteca biblioteca, GestionePrestiti gestioneUtenti, GestioneUtenti gestioneUtenti1, Scanner scanner) {
     }
 
     private static void richiediPrestito(Biblioteca biblioteca, GestioneUtenti gestioneUtenti, GestionePrestiti gestionePrestiti, Scanner scanner) {
+
     }
 
     private static void ricercaMateriale(Biblioteca biblioteca, Scanner scanner) {
@@ -159,6 +240,17 @@ public class Main {
     }
 
     private static void aggiungiUtente(GestioneUtenti gestioneUtenti, Scanner scanner) {
+        System.out.println("Inserisci id utente: ");
+        int id= scanner.nextInt();
+        scanner.nextLine();
+        System.out.println("Inserisci nome: ");
+        String nome= scanner.nextLine();
+        System.out.println("Inserisci cognome: ");
+        String cognome= scanner.nextLine();
+        Utente utente = new Utente(id, nome, cognome);
+        gestioneUtenti.aggiungiUtente(utente);
+        System.out.println("Utente aggiunto correttamente! " +utente );
+
 
     }
 
@@ -236,6 +328,5 @@ public class Main {
             System.out.println("Formato data errato! ");
             return new Autore(nome, cognome, null);
         }
-
     }
 }
