@@ -53,4 +53,16 @@ public class GestionePrestiti {
         }
         return risultato;
     }
+    public Prestito ricercaPrestito(long idUtente, long idMateriale, LocalDate dataPrestito){
+        for(Prestito prestito: collezionePrestito){
+            if(idUtente==prestito.getRiferimentoUtente().getId() && idMateriale==prestito.getRiferimentoMateriale().getId() && dataPrestito.equals(prestito.getDataPrestito())){
+                return prestito;
+            }
+        }
+        return null;
+    }
+
+    public Set<Prestito> getCollezionePrestito() {
+        return collezionePrestito;
+    }
 }

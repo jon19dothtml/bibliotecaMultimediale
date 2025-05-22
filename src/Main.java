@@ -16,7 +16,7 @@ public class Main {
 
         Biblioteca biblioteca = Main.caricaBiblioteca();
         GestioneUtenti gestioneUtenti= Main.caricaUtenti();
-        GestionePrestiti gestionePrestiti = new GestionePrestiti();
+        GestionePrestiti gestionePrestiti = Main.caricaPrestiti();
         int scelta = 0;
         do {
             System.out.println("""
@@ -27,6 +27,8 @@ public class Main {
                     4- per richiedere un prestito\s
                     5- per restituire un prestito\s
                     6- per ricercare un utente\s
+                    7- per ricercare un prestito\s
+                    8- per stampare tutti i prestiti\s
                     0- per uscire""");
             Scanner scanner = new Scanner(System.in);
             scelta = scanner.nextInt();
@@ -53,12 +55,16 @@ public class Main {
                 case 6:
                     Main.ricercaUtente(gestioneUtenti, scanner);
                     break;
+                case 7:
+                    Main.ricercaPrestito(biblioteca, gestioneUtenti, gestionePrestiti, scanner);
+                    break;
                 default:
                     System.out.println("Scelta non valida!!! Arrivederci e grazie");
             }
         } while (scelta != 0);
         Main.salvaBibilioteca(biblioteca);
         Main.salvaUtenti(gestioneUtenti);
+        Main.salvaPrestiti(gestionePrestiti);
     }
 
     private static void salvaBibilioteca(Biblioteca biblioteca) {
@@ -123,6 +129,39 @@ public class Main {
         return gestioneUtenti;
     }
 
+    public static void salvaPrestiti(GestionePrestiti gestionePrestiti){
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("C:/Users/A880apulia/IdeaProjects/Biblioteca/resource/prestito.txt"))) {
+            for (Prestito prestito : gestionePrestiti.getCollezionePrestito()) {
+                outputStream.writeObject(prestito);
+            }
+        } catch (IOException ex) {
+            System.out.println("Eccezione in scrittura");
+            ex.printStackTrace();
+        }
+    }
+
+    public static GestionePrestiti caricaPrestiti(){
+        GestionePrestiti gestionePrestiti= new GestionePrestiti();
+        try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("C:/Users/A880apulia/IdeaProjects/Biblioteca/resource/prestito.txt"))) {
+            Prestito prestito= null;
+            while ((prestito = (Prestito) inputStream.readObject()) != null) {
+                gestionePrestiti.aggiungiPrestito(prestito);
+            }
+            System.out.println("Caricati: " + gestionePrestiti.getCollezionePrestito().size());
+            return gestionePrestiti;
+        }catch (EOFException eofException) {
+            System.out.println("End of file raggiunta");
+        } catch (IOException | ClassNotFoundException ioEx) {
+            System.out.println("Eccezione");
+            ioEx.printStackTrace();
+        } finally {
+            System.out.println("Questo lo eseguo sempre");
+        }
+        return gestionePrestiti;
+    }
+
+
+
     private static void ricercaUtente(GestioneUtenti gestioneUtenti, Scanner scanner) {
         System.out.println("Scegli per cosa ricercare. Spingi: " +
                 "\n1- per ricercare per id" +
@@ -174,7 +213,29 @@ public class Main {
         }
     }
 
-    private static void restituzionePrestito(Biblioteca biblioteca, GestionePrestiti gestioneUtenti, GestioneUtenti gestioneUtenti1, Scanner scanner) {
+    private static void restituzionePrestito(Biblioteca biblioteca, GestionePrestiti gestionePrestiti, GestioneUtenti gestioneUtenti, Scanner scanner) {
+        System.out.println("Inserisci l'id del materiale");
+        long id;
+        id=scanner.nextLong();
+        scanner.nextLine();
+        MaterialeBiblioteca riferimentoMateriale= biblioteca.ricercaElementi(id);
+        System.out.println("Inserisci l'id dell'utente");
+        id= scanner.nextLong();
+        scanner.nextLine();
+        Utente riferimentoUtente= gestioneUtenti.ricercaUtente((int) id);
+        System.out.println("Inserisci la data di inizio prestito nel formato gg/mm/aaaa ");
+        String dataPrestito = scanner.nextLine();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate dataFormattataItalia = null;
+        try {
+            dataFormattataItalia = LocalDate.parse(dataPrestito, format);
+            if (riferimentoUtente!=null && riferimentoMateriale!=null) {
+                gestionePrestiti.restituzionePrestito(riferimentoUtente.getId(), riferimentoMateriale.getId(), dataFormattataItalia);
+                riferimentoMateriale.setDisponibilita(riferimentoMateriale.getDisponibilita() + 1);
+            }
+        } catch (DateTimeParseException ex) {
+            System.out.println("Formato data errato! ");
+        }
     }
 
     private static void richiediPrestito(Biblioteca biblioteca, GestioneUtenti gestioneUtenti, GestionePrestiti gestionePrestiti, Scanner scanner) {
@@ -191,6 +252,8 @@ public class Main {
         if(riferimentoUtente!=null && riferimentoMateriale!=null && riferimentoMateriale.getDisponibilita()>0){
             riferimentoMateriale.setDisponibilita(riferimentoMateriale.getDisponibilita()-1);
             Prestito prestito= new Prestito(riferimentoMateriale, riferimentoUtente, dataPrestito);
+            gestionePrestiti.aggiungiPrestito(prestito);
+            System.out.println("Prestito creato con successo! " + prestito);
         }
     }
 
@@ -260,8 +323,6 @@ public class Main {
         Utente utente = new Utente(id, nome, cognome);
         gestioneUtenti.aggiungiUtente(utente);
         System.out.println("Utente aggiunto correttamente! " +utente );
-
-
     }
 
     private static void aggiungiMateriale(Biblioteca biblioteca, Scanner scanner) {
@@ -337,6 +398,66 @@ public class Main {
         } catch (DateTimeParseException ex) {
             System.out.println("Formato data errato! ");
             return new Autore(nome, cognome, null);
+        }
+    }
+
+    public static void ricercaPrestito(Biblioteca biblioteca, GestioneUtenti gestioneUtenti, GestionePrestiti gestionePrestiti, Scanner scanner){
+        System.out.println("""
+                Scegli come ricercare il prestito. Spingi: \s" +
+                "1- per ricercare per utente\s" +
+                "2- per ricercare per materiale""");
+        int scelta=scanner.nextInt();
+        scanner.nextLine();
+        switch (scelta){
+            case 1:
+                System.out.println("Inserisci l'id dell'utente: ");
+                int idUtente= scanner.nextInt();
+                scanner.nextLine();
+                System.out.println("Inserisci il nome dell'utente: ");
+                String nome= scanner.nextLine();
+                System.out.println("Inserisci il cognome dell'utente: ");
+                String cognome= scanner.nextLine();
+                Utente utente= new Utente(idUtente, nome, cognome);
+                try{
+                    List<Prestito> risultatoPrestito= gestionePrestiti.ricercaPrestito(utente);
+                    System.out.println("Risultato: " +risultatoPrestito);
+                } catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con Utente: " + utente);
+
+                }
+                break;
+            case 2:
+                System.out.println("Inserisci l'id del materiale: ");
+                long idMateriale=scanner.nextInt();
+                scanner.nextLine();
+                MaterialeBiblioteca materialeBiblioteca= biblioteca.ricercaElementi(idMateriale);
+                try{
+                    List<Prestito> risultatoPrestito= gestionePrestiti.ricercaPrestito(materialeBiblioteca);
+                    System.out.println("Risultato: " +risultatoPrestito);
+                } catch (Exception e) {
+                    System.out.println("non ho trovato nessun elemento con materiale: " + materialeBiblioteca);
+                }
+                break;
+            case 3:
+                System.out.println("Inserisci l'id dell'utente: ");
+                idUtente= scanner.nextInt();
+                scanner.nextLine();
+                System.out.println("Inserisci l'id del materiale: ");
+                idMateriale=scanner.nextInt();
+                scanner.nextLine();
+                System.out.println("Inserisci la data di inizio prestito nel formato gg/mm/aaaa ");
+                String dataPrestito = scanner.nextLine();
+                DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                try {
+                    LocalDate dataFormattataItalia = LocalDate.parse(dataPrestito, format);
+                    Prestito risultato= gestionePrestiti.ricercaPrestito(idUtente, idMateriale, dataFormattataItalia);
+                    System.out.println("Risultato: " +risultato);
+                } catch (DateTimeParseException ex) {
+                    System.out.println("Formato data errato! ");
+                }
+                break;
+            default:
+                System.out.println("Errore");
         }
     }
 }
